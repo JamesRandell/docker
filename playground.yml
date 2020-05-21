@@ -1,0 +1,96 @@
+- name: Setup server
+  hosts: localhost
+  gather_facts: false
+  vars:
+    default_container_name: mssql_container
+    default_container_image: mcr.microsoft.com/mssql/server:2019-latest
+    my_setup: "{{ setup }}"
+
+  tasks:
+    - name: Setup
+      block:
+      - name: Test msg
+        debug: 
+          msg: "Ansible is working!"
+
+      - name: Install PIP library
+        #when: not my_setup
+        apt: name=python-pip update_cache=yes force_apt_get=yes
+
+      - name: Install Python library
+        #when: not my_setup
+        apt: name=python-docker update_cache=yes force_apt_get=yes
+
+      - name: Install pywinrm
+        #when: not my_setup
+        pip:
+          name: pywinrm
+
+      - name: Install required system packages
+        #when: not my_setup
+        apt: name={{ item }} state=latest update_cache=yes
+        loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools', 'docker-compose']
+      
+      - name: Add Docker GPG apt Key
+        #when: not my_setup
+        apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+      
+      - name: Add Docker Repository
+        #when: not my_setup
+        apt_repository:
+          repo: deb https://download.docker.com/linux/ubuntu bionic stable
+          state: present
+      
+      - name: Update apt and install docker-ce
+        #when: not my_setup
+        apt: update_cache=yes name=docker-ce state=latest
+    
+      - name: Install Docker Module for Python
+        #when: not my_setup
+        pip:
+          name: docker>2.6.0
+
+      - name: Ensure docker deamon is running
+        #when: not my_setup
+        service:
+          name: docker
+          state: started
+        become: true
+      when: my_setup|bool == True
+
+- name: Create sample MsSQL container
+  hosts: localhost
+  gather_facts: false
+  vars:
+    default_container_name: mssql_container
+    default_container_image: mcr.microsoft.com/mssql/server:2019-latest
+    
+  tasks:
+    - name: MsSQL 1
+      docker_container:
+        name: "{{ default_container_name }}1"
+        image: "{{ default_container_image }}"
+        state: started
+        ports:
+        - "31433:1433"
+        env:
+          SA_PASSWORD: "pa55w0rd!"
+          ACCEPT_EULA: "Y" 
+        mounts:
+          - "type=bind,source=//mnt/c/Docker/Volumes/SQLServer,target=/var/opt/mssql/stackoverflow"
+
+    - name: MsSQL 2
+      docker_container:
+        name: "{{ default_container_name }}2"
+        image: "{{ default_container_image}}"
+        state: started
+        ports:
+        - "41433:1433"
+        env:
+          SA_PASSWORD: "pa55w0rd!"
+          ACCEPT_EULA: "Y" 
+        mounts:
+          - "type=bind,source=//mnt/c/Docker/Volumes/SQLServer,target=/var/opt/mssql/stackoverflow"
+    
