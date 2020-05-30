@@ -1,0 +1,5 @@
+Kubernetes is a cluster management tool. If comparing to Docker and Ansible, I split it up in the following:
+
+Docker: The container
+Ansible: A tool you can use to script out docker containers. You can also use the dockerfile, though i'm going down the Ansible route as i see it as more open
+Kubernetes: A cluster management tool. I see this as the software that manages the hardware. Your Ansible configuration then uses the Kubernetes cluster to deploy docker containers on for example.

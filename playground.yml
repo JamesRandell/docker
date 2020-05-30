@@ -66,6 +66,7 @@
   vars:
     default_container_name: mssql_container
     default_container_image: mcr.microsoft.com/mssql/server:2019-latest
+    mssql_password: pa55w0rd!
     
   tasks:
     - name: MsSQL 1
@@ -76,10 +77,18 @@
         ports:
         - "31433:1433"
         env:
-          SA_PASSWORD: "pa55w0rd!"
+          SA_PASSWORD: "{{ mssql_password }}"
           ACCEPT_EULA: "Y" 
         mounts:
           - "type=bind,source=//mnt/c/Docker/Volumes/SQLServer,target=/var/opt/mssql/stackoverflow"
+       
+    - name: wait
+      wait_for:
+        timeout: 30
+      delegate_to: localhost
+
+    - name: Execute command in previous docker container
+      command: "docker exec {{ default_container_name }}1 bash -l -c /var/opt/mssql/stackoverflow/attach-db.sh"
 
     - name: MsSQL 2
       docker_container:
@@ -89,7 +98,7 @@
         ports:
         - "41433:1433"
         env:
-          SA_PASSWORD: "pa55w0rd!"
+          SA_PASSWORD: "{{ mssql_password }}"
           ACCEPT_EULA: "Y" 
         mounts:
           - "type=bind,source=//mnt/c/Docker/Volumes/SQLServer,target=/var/opt/mssql/stackoverflow"
