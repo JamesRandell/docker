@@ -1,0 +1,33 @@
+Kubernetes is a cluster management tool. If comparing to Docker and Ansible, I split it up in the following:
+
+Docker: The container
+Ansible: A tool you can use to script out docker containers. You can also use the dockerfile, though i'm going down the Ansible route as i see it as more open
+Kubernetes: A cluster management tool. I see this as the software that manages the hardware. Your Ansible configuration then uses the Kubernetes cluster to deploy docker containers on for example.
+
+
+https://kubernetes.io/docs/tasks/tools/install-minikube/
+
+You need VirtualBox or Hyper-V
+I've got HyperV already installed due to having WSL on my Windows 10 Home PC. Typing 'systeminfo' into a command prompt will show this (it'll be at the bottom under "Hyper-V Requirements")
+
+https://github.com/kubernetes/minikube/releases/latest/download/minikube-installer.exe
+
+# The rest is really straight forward for Windows. I didn't use the package manager forthis (Chocolatey) and just went direct for the exe download
+
+# You'll need to close and re-open a CMD window to load the update system PATH to run minikube commands.
+# Once done, you can:
+
+minikube start
+
+# This will download the neccesary image files to run the kube.
+# Once minikube start finishes, run the command below to check the status of the cluster:
+
+minikube status
+
+# If your cluster is running, the output from minikube status should be similar to:
+
+# host: Running
+# kubelet: Running
+# apiserver: Running
+# kubeconfig: Configured
+
